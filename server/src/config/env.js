@@ -7,3 +7,10 @@ export const env = {
   databaseUrl: process.env.DATABASE_URL,
   jwtSecret: process.env.JWT_SECRET,
 };
+
+const requiredVars = ["databaseUrl", "jwtSecret"];
+for (const key of requiredVars) {
+  if (!env[key]) {
+    throw new Error(`Missing required environment variable for "${key}" — check your .env file`);
+  }
+}
