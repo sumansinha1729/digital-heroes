@@ -3,6 +3,7 @@ import { AdminShell } from "../../components/layout/AdminShell.jsx";
 import { Button } from "../../components/ui/Button.jsx";
 import { TextField } from "../../components/ui/TextField.jsx";
 import { Badge } from "../../components/ui/Badge.jsx";
+import { Modal } from "../../components/ui/Modal.jsx";
 import { getCharities, getCharity } from "../../api/charities.js";
 import { createCharity, updateCharity, deleteCharity } from "../../api/admin.js";
 import { ApiError } from "../../api/client.js";
@@ -10,7 +11,7 @@ import { EventManager } from "./EventManager.jsx";
 
 const EMPTY_FORM = { name: "", description: "", imageUrl: "", isFeatured: false };
 
-function CharityFormPanel({ initial, onCancel, onSaved }) {
+function CharityFormPanel({ initial, onClose, onSaved }) {
   const [form, setForm] = useState(initial || EMPTY_FORM);
   const [error, setError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -56,7 +57,7 @@ function CharityFormPanel({ initial, onCancel, onSaved }) {
   }
 
   return (
-    <div className="rounded-2xl border border-border-light bg-white p-5">
+    <div>
       <h2 className="font-sans text-lg font-semibold">{isEditing ? "Edit charity" : "Add charity"}</h2>
       <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-4">
         <TextField
@@ -100,7 +101,7 @@ function CharityFormPanel({ initial, onCancel, onSaved }) {
           <Button type="submit" variant="primary" disabled={isSaving}>
             {isSaving ? "Saving…" : "Save"}
           </Button>
-          <Button type="button" variant="secondary" onClick={onCancel}>
+          <Button type="button" variant="secondary" onClick={onClose}>
             Cancel
           </Button>
         </div>
@@ -116,7 +117,7 @@ function CharityFormPanel({ initial, onCancel, onSaved }) {
 export function AdminCharities() {
   const [charities, setCharities] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [panel, setPanel] = useState(null); // null | "new" | charity object
+  const [modal, setModal] = useState(null); // null | "new" | charity object
   const [deleteError, setDeleteError] = useState("");
 
   const loadCharities = useCallback(async () => {
@@ -142,7 +143,7 @@ export function AdminCharities() {
   }
 
   function handleSaved() {
-    setPanel(null);
+    setModal(null);
     loadCharities();
   }
 
@@ -150,21 +151,19 @@ export function AdminCharities() {
     <AdminShell>
       <div className="flex items-center justify-between">
         <h1 className="font-sans text-2xl font-semibold">Charities</h1>
-        {!panel && (
-          <Button variant="primary" onClick={() => setPanel("new")}>
-            Add charity
-          </Button>
-        )}
+        <Button variant="primary" onClick={() => setModal("new")}>
+          Add charity
+        </Button>
       </div>
 
-      {panel && (
-        <div className="mt-4">
+      {modal && (
+        <Modal onClose={() => setModal(null)}>
           <CharityFormPanel
-            initial={panel === "new" ? null : panel}
-            onCancel={() => setPanel(null)}
+            initial={modal === "new" ? null : modal}
+            onClose={() => setModal(null)}
             onSaved={handleSaved}
           />
-        </div>
+        </Modal>
       )}
 
       {deleteError && <p className="mt-4 text-sm text-danger">{deleteError}</p>}
@@ -197,7 +196,7 @@ export function AdminCharities() {
                   <td className="px-4 py-3">
                     <div className="flex gap-3">
                       <button
-                        onClick={() => setPanel(charity)}
+                        onClick={() => setModal(charity)}
                         className="text-accent-action hover:underline"
                       >
                         Edit
