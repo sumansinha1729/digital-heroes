@@ -1,0 +1,41 @@
+@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap");
+
+@theme {
+  /* Colors — see DECISIONS.md / architecture doc for the meaning of each role.
+     Charity = forest green, Prize = amber/gold, Action = coral. Never swapped. */
+  --color-bg: #0b1220;
+  --color-surface: #f7f5ef;
+  --color-surface-dark: #111a2e;
+  --color-text-primary: #12181f;
+  --color-text-primary-dark: #f5f3ed;
+  --color-text-muted: #5b6472;
+  --color-accent-charity: #4c7a57;
+  --color-accent-prize: #c9862e;
+  --color-accent-action: #e8563f;
+  --color-border: #232b3d;
+  --color-border-light: #dedad0;
+  --color-success: #4c7a57;
+  --color-danger: #c0392b;
+
+  /* Type */
+  --font-serif: "Fraunces", Georgia, serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+
+  /* Spacing scale — 8px base unit */
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 16px;
+  --spacing-4: 24px;
+  --spacing-5: 32px;
+  --spacing-6: 48px;
+  --spacing-7: 64px;
+  --spacing-8: 96px;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+}
