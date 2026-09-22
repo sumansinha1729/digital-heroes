@@ -66,3 +66,23 @@ export async function deleteScore(userId, scoreId) {
   await getOwnedScore(userId, scoreId);
   await prisma.score.delete({ where: { id: scoreId } });
 }
+
+// Admin override — no ownership check, since the whole point is editing any user's score.
+export async function adminUpdateScore(scoreId, { scoreValue, scoreDate }) {
+  const existing = await prisma.score.findUnique({ where: { id: scoreId } });
+  if (!existing) {
+    throw new ScoreError("Score not found", 404);
+  }
+
+  try {
+    return await prisma.score.update({
+      where: { id: scoreId },
+      data: { scoreValue, scoreDate: new Date(scoreDate) },
+    });
+  } catch (err) {
+    if (err.code === "P2002") {
+      throw new ScoreError("A score already exists for this date", 409);
+    }
+    throw err;
+  }
+}

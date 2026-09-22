@@ -9,6 +9,9 @@ import { RequireAuth } from "./components/layout/RequireAuth.jsx";
 import { RequireAdmin } from "./components/layout/RequireAdmin.jsx";
 import { AdminCharities } from "./pages/admin/AdminCharities.jsx";
 import { AdminDraws } from "./pages/admin/AdminDraws.jsx";
+import { AdminWinners } from "./pages/admin/AdminWinners.jsx";
+import { AdminUsers } from "./pages/admin/AdminUsers.jsx";
+import { AdminReports } from "./pages/admin/AdminReports.jsx";
 
 export function App() {
   return (
@@ -39,6 +42,30 @@ export function App() {
         element={
           <RequireAdmin>
             <AdminDraws />
+          </RequireAdmin>
+        }
+      />
+      <Route
+        path="/admin/winners"
+        element={
+          <RequireAdmin>
+            <AdminWinners />
+          </RequireAdmin>
+        }
+      />
+      <Route
+        path="/admin/users"
+        element={
+          <RequireAdmin>
+            <AdminUsers />
+          </RequireAdmin>
+        }
+      />
+      <Route
+        path="/admin/reports"
+        element={
+          <RequireAdmin>
+            <AdminReports />
           </RequireAdmin>
         }
       />

@@ -43,3 +43,41 @@ export function simulateDraw(id) {
 export function publishDraw(id) {
   return apiRequest(`/admin/draws/${id}/publish`, { method: "POST" });
 }
+
+export function getAdminWinners(status) {
+  const query = status ? `?status=${status}` : "";
+  return apiRequest(`/admin/winners${query}`);
+}
+
+export function verifyWinner(id, decision, reason) {
+  return apiRequest(`/admin/winners/${id}/verify`, { method: "PUT", body: { decision, reason } });
+}
+
+export function markWinnerPaid(id) {
+  return apiRequest(`/admin/winners/${id}/payout`, { method: "PUT" });
+}
+
+export function getAdminUsers(search) {
+  const query = search ? `?search=${encodeURIComponent(search)}` : "";
+  return apiRequest(`/admin/users${query}`);
+}
+
+export function getAdminUserDetail(id) {
+  return apiRequest(`/admin/users/${id}`);
+}
+
+export function updateAdminUser(id, data) {
+  return apiRequest(`/admin/users/${id}`, { method: "PUT", body: data });
+}
+
+export function updateAdminUserSubscription(id, data) {
+  return apiRequest(`/admin/users/${id}/subscription`, { method: "PUT", body: data });
+}
+
+export function updateAdminScore(id, data) {
+  return apiRequest(`/admin/scores/${id}`, { method: "PUT", body: data });
+}
+
+export function getAdminReports() {
+  return apiRequest("/admin/reports");
+}

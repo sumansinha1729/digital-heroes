@@ -9,14 +9,26 @@ import {
 } from "../services/charities.service.js";
 import { createEvent, updateEvent, deleteEvent, EventError } from "../services/events.service.js";
 import { createDraw, simulateDraw, publishDraw, listDraws, getDrawById, DrawError } from "../services/draws.service.js";
+import { listAdminWinners, approveWinner, rejectWinner, markWinnerPaid, WinnerError } from "../services/winners.service.js";
+import { listUsers, getUserDetail, updateUser, updateUserSubscription, UserError } from "../services/users.service.js";
+import { adminUpdateScore, ScoreError } from "../services/scores.service.js";
+import { getReports } from "../services/reports.service.js";
 
 const router = Router();
 
 router.use(requireAuth, requireRole("ADMIN"));
 
-// CharityError, EventError, and DrawError all carry { message, statusCode } — treated the same way.
+// CharityError, EventError, DrawError, WinnerError, UserError, and ScoreError all carry
+// { message, statusCode }.
 function handleServiceError(err, res) {
-  if (err instanceof CharityError || err instanceof EventError || err instanceof DrawError) {
+  if (
+    err instanceof CharityError ||
+    err instanceof EventError ||
+    err instanceof DrawError ||
+    err instanceof WinnerError ||
+    err instanceof UserError ||
+    err instanceof ScoreError
+  ) {
     return res.status(err.statusCode).json({ error: err.message });
   }
   console.error(err);
@@ -158,6 +170,114 @@ router.post("/draws/:id/publish", async (req, res) => {
   try {
     const draw = await publishDraw(req.params.id);
     res.json({ draw });
+  } catch (err) {
+    handleServiceError(err, res);
+  }
+});
+
+router.get("/winners", async (req, res) => {
+  try {
+    const winners = await listAdminWinners({ status: req.query.status });
+    res.json({ winners });
+  } catch (err) {
+    handleServiceError(err, res);
+  }
+});
+
+router.put("/winners/:id/verify", async (req, res) => {
+  const { decision, reason } = req.body;
+
+  if (decision !== "APPROVED" && decision !== "REJECTED") {
+    return res.status(400).json({ error: "decision must be APPROVED or REJECTED" });
+  }
+  if (decision === "REJECTED" && !(typeof reason === "string" && reason.trim().length > 0)) {
+    return res.status(400).json({ error: "A reason is required when rejecting a winner" });
+  }
+
+  try {
+    const winner =
+      decision === "APPROVED"
+        ? await approveWinner(req.user.userId, req.params.id)
+        : await rejectWinner(req.user.userId, req.params.id, reason);
+    res.json({ winner });
+  } catch (err) {
+    handleServiceError(err, res);
+  }
+});
+
+router.put("/winners/:id/payout", async (req, res) => {
+  try {
+    const winner = await markWinnerPaid(req.params.id);
+    res.json({ winner });
+  } catch (err) {
+    handleServiceError(err, res);
+  }
+});
+
+router.get("/users", async (req, res) => {
+  try {
+    const users = await listUsers({ search: req.query.search });
+    res.json({ users });
+  } catch (err) {
+    handleServiceError(err, res);
+  }
+});
+
+router.get("/users/:id", async (req, res) => {
+  try {
+    const user = await getUserDetail(req.params.id);
+    res.json({ user });
+  } catch (err) {
+    handleServiceError(err, res);
+  }
+});
+
+router.put("/users/:id", async (req, res) => {
+  const { fullName, role } = req.body;
+  try {
+    const user = await updateUser(req.params.id, { fullName, role });
+    res.json({ user });
+  } catch (err) {
+    handleServiceError(err, res);
+  }
+});
+
+router.put("/users/:id/subscription", async (req, res) => {
+  const { status, charityId, charityPercentage } = req.body;
+  try {
+    const subscription = await updateUserSubscription(req.params.id, {
+      status,
+      charityId,
+      charityPercentage,
+    });
+    res.json({ subscription });
+  } catch (err) {
+    handleServiceError(err, res);
+  }
+});
+
+router.put("/scores/:id", async (req, res) => {
+  const { scoreValue, scoreDate } = req.body;
+
+  if (!Number.isInteger(scoreValue) || scoreValue < 1 || scoreValue > 45) {
+    return res.status(400).json({ error: "scoreValue must be an integer between 1 and 45" });
+  }
+  if (!scoreDate || Number.isNaN(new Date(scoreDate).getTime())) {
+    return res.status(400).json({ error: "scoreDate must be a valid date" });
+  }
+
+  try {
+    const score = await adminUpdateScore(req.params.id, { scoreValue, scoreDate });
+    res.json({ score });
+  } catch (err) {
+    handleServiceError(err, res);
+  }
+});
+
+router.get("/reports", async (req, res) => {
+  try {
+    const reports = await getReports();
+    res.json(reports);
   } catch (err) {
     handleServiceError(err, res);
   }

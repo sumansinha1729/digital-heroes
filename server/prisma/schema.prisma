@@ -214,6 +214,7 @@ model DrawWinner {
   payoutStatus       PayoutStatus       @default(PENDING)
   reviewedByAdminId  String?
   reviewedAt         DateTime?
+  rejectionReason    String?
   createdAt          DateTime           @default(now())
 
   @@index([drawId])

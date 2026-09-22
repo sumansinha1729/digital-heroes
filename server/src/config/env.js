@@ -11,6 +11,9 @@ export const env = {
   stripePriceMonthly: process.env.STRIPE_PRICE_MONTHLY,
   stripePriceYearly: process.env.STRIPE_PRICE_YEARLY,
   clientUrl: process.env.CLIENT_URL || "http://localhost:5173",
+  supabaseUrl: process.env.SUPABASE_URL,
+  supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+  supabaseStorageBucket: process.env.SUPABASE_STORAGE_BUCKET || "winner-proofs",
 };
 
 const requiredVars = [
@@ -19,6 +22,8 @@ const requiredVars = [
   "stripeSecretKey",
   "stripePriceMonthly",
   "stripePriceYearly",
+  "supabaseUrl",
+  "supabaseServiceRoleKey",
 ];
 for (const key of requiredVars) {
   if (!env[key]) {
