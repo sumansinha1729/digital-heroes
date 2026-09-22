@@ -22,15 +22,12 @@
   --font-serif: "Fraunces", Georgia, serif;
   --font-sans: "Inter", system-ui, sans-serif;
 
-  /* Spacing scale — 8px base unit */
-  --spacing-1: 4px;
-  --spacing-2: 8px;
-  --spacing-3: 16px;
-  --spacing-4: 24px;
-  --spacing-5: 32px;
-  --spacing-6: 48px;
-  --spacing-7: 64px;
-  --spacing-8: 96px;
+  /* Section-level spacing per the architecture doc's 8/16/24/32/48/64/96px scale.
+     Named tokens (not spacing-N) so they don't collide with Tailwind's own numeric
+     spacing scale, where mt-8 etc. means 8 * --spacing (4px), not "step 8" of our scale. */
+  --spacing-section-sm: 48px;
+  --spacing-section-md: 64px;
+  --spacing-section-lg: 96px;
 }
 
 body {
@@ -50,4 +47,14 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Chrome/Safari force a white background + black text on autofilled inputs, ignoring our
+   classes entirely. This is the standard workaround: a huge transition delay stops the
+   browser's own autofill background color from ever visually taking effect. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: inherit;
+  transition: background-color 600000s 0s, color 600000s 0s;
 }
