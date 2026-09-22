@@ -6,6 +6,7 @@ import scoresRoutes from "./routes/scores.routes.js";
 import subscriptionsRoutes from "./routes/subscriptions.routes.js";
 import charitiesRoutes from "./routes/charities.routes.js";
 import donationsRoutes from "./routes/donations.routes.js";
+import drawsRoutes from "./routes/draws.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import webhooksRoutes from "./routes/webhooks.routes.js";
 
@@ -28,6 +29,7 @@ app.use("/api/scores", scoresRoutes);
 app.use("/api/subscriptions", subscriptionsRoutes);
 app.use("/api/charities", charitiesRoutes);
 app.use("/api/donations", donationsRoutes);
+app.use("/api/draws", drawsRoutes);
 app.use("/api/admin", adminRoutes);
 
 app.listen(env.port, () => {

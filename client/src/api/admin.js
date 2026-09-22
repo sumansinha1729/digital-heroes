@@ -23,3 +23,23 @@ export function updateEvent(id, data) {
 export function deleteEvent(id) {
   return apiRequest(`/admin/events/${id}`, { method: "DELETE" });
 }
+
+export function getAdminDraws() {
+  return apiRequest("/admin/draws");
+}
+
+export function getAdminDraw(id) {
+  return apiRequest(`/admin/draws/${id}`);
+}
+
+export function createDraw(data) {
+  return apiRequest("/admin/draws", { method: "POST", body: data });
+}
+
+export function simulateDraw(id) {
+  return apiRequest(`/admin/draws/${id}/simulate`, { method: "POST" });
+}
+
+export function publishDraw(id) {
+  return apiRequest(`/admin/draws/${id}/publish`, { method: "POST" });
+}

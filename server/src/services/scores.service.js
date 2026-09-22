@@ -1,4 +1,5 @@
 import { prisma } from "../config/prisma.js";
+import { enterDrawIfEligible } from "./draws.service.js";
 
 const RECENT_SCORES_LIMIT = 5;
 
@@ -18,8 +19,9 @@ export async function listRecentScores(userId) {
 }
 
 export async function createScore(userId, { scoreValue, scoreDate }) {
+  let score;
   try {
-    return await prisma.score.create({
+    score = await prisma.score.create({
       data: { userId, scoreValue, scoreDate: new Date(scoreDate) },
     });
   } catch (err) {
@@ -28,6 +30,12 @@ export async function createScore(userId, { scoreValue, scoreDate }) {
     }
     throw err;
   }
+
+  // Per D15/D16: this is a no-op unless an admin has already created a DRAFT draw whose
+  // period covers today. A score always saves successfully regardless of draw entry outcome.
+  await enterDrawIfEligible(userId);
+
+  return score;
 }
 
 async function getOwnedScore(userId, scoreId) {

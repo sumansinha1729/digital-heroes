@@ -8,6 +8,7 @@ import { CharityProfile } from "./pages/CharityProfile.jsx";
 import { RequireAuth } from "./components/layout/RequireAuth.jsx";
 import { RequireAdmin } from "./components/layout/RequireAdmin.jsx";
 import { AdminCharities } from "./pages/admin/AdminCharities.jsx";
+import { AdminDraws } from "./pages/admin/AdminDraws.jsx";
 
 export function App() {
   return (
@@ -30,6 +31,14 @@ export function App() {
         element={
           <RequireAdmin>
             <AdminCharities />
+          </RequireAdmin>
+        }
+      />
+      <Route
+        path="/admin/draws"
+        element={
+          <RequireAdmin>
+            <AdminDraws />
           </RequireAdmin>
         }
       />

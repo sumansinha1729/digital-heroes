@@ -8,14 +8,15 @@ import {
   CharityError,
 } from "../services/charities.service.js";
 import { createEvent, updateEvent, deleteEvent, EventError } from "../services/events.service.js";
+import { createDraw, simulateDraw, publishDraw, listDraws, getDrawById, DrawError } from "../services/draws.service.js";
 
 const router = Router();
 
 router.use(requireAuth, requireRole("ADMIN"));
 
-// Both CharityError and EventError carry { message, statusCode } — treated the same way here.
+// CharityError, EventError, and DrawError all carry { message, statusCode } — treated the same way.
 function handleServiceError(err, res) {
-  if (err instanceof CharityError || err instanceof EventError) {
+  if (err instanceof CharityError || err instanceof EventError || err instanceof DrawError) {
     return res.status(err.statusCode).json({ error: err.message });
   }
   console.error(err);
@@ -100,6 +101,63 @@ router.delete("/events/:id", async (req, res) => {
   try {
     await deleteEvent(req.params.id);
     res.status(204).send();
+  } catch (err) {
+    handleServiceError(err, res);
+  }
+});
+
+router.get("/draws", async (req, res) => {
+  try {
+    const draws = await listDraws();
+    res.json({ draws });
+  } catch (err) {
+    handleServiceError(err, res);
+  }
+});
+
+router.get("/draws/:id", async (req, res) => {
+  try {
+    const draw = await getDrawById(req.params.id);
+    res.json({ draw });
+  } catch (err) {
+    handleServiceError(err, res);
+  }
+});
+
+router.post("/draws", async (req, res) => {
+  const { drawMonth, periodStart, periodEnd, logicType } = req.body;
+
+  if (!drawMonth || Number.isNaN(new Date(drawMonth).getTime())) {
+    return res.status(400).json({ error: "drawMonth must be a valid date" });
+  }
+  if (!periodStart || Number.isNaN(new Date(periodStart).getTime())) {
+    return res.status(400).json({ error: "periodStart must be a valid date" });
+  }
+  if (!periodEnd || Number.isNaN(new Date(periodEnd).getTime())) {
+    return res.status(400).json({ error: "periodEnd must be a valid date" });
+  }
+
+  try {
+    const draw = await createDraw({ drawMonth, periodStart, periodEnd, logicType });
+    res.status(201).json({ draw });
+  } catch (err) {
+    handleServiceError(err, res);
+  }
+});
+
+router.post("/draws/:id/simulate", async (req, res) => {
+  try {
+    const result = await simulateDraw(req.params.id);
+    res.json(result);
+  } catch (err) {
+    handleServiceError(err, res);
+  }
+});
+
+router.post("/draws/:id/publish", async (req, res) => {
+  try {
+    const draw = await publishDraw(req.params.id);
+    res.json({ draw });
   } catch (err) {
     handleServiceError(err, res);
   }
