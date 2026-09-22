@@ -18,31 +18,41 @@ function addInterval(date, plan) {
   return result;
 }
 
-// Atomically creates the Subscription row for this Stripe subscription if it doesn't exist yet,
-// or returns the existing one untouched if it does. Using upsert (a single atomic DB operation)
-// instead of a separate "check, then create" pair closes the race window: two concurrent webhook
-// deliveries for the same Stripe subscription can both call this safely — the database's unique
-// constraint on stripeSubscriptionId guarantees only one row is ever created, and the second
-// caller's upsert just returns that same row via the `update: {}` no-op branch.
+// Creates the Subscription row for this Stripe subscription if it doesn't exist yet, or returns
+// the existing one if it does. Prisma's upsert reduces the race window between two concurrent
+// webhook deliveries for the same Stripe subscription (e.g. invoice.paid and
+// checkout.session.completed landing close together) but is NOT fully atomic under Postgres —
+// it's implemented as a SELECT followed by an INSERT or UPDATE, so two upserts can both see "no
+// row yet" and both attempt to INSERT. The DB's unique constraint on stripeSubscriptionId still
+// guarantees only one row ever exists, but the "loser" of that race gets a P2002 error from
+// upsert instead of gracefully returning the winner's row — so we catch that specific case and
+// re-fetch the row the other call just created.
 async function upsertSubscriptionFromCheckoutMetadata({ userId, plan, charityId, charityPercentage }, stripeCustomerId, stripeSubscriptionId) {
   const periodStart = new Date();
   const periodEnd = addInterval(periodStart, plan);
 
-  return prisma.subscription.upsert({
-    where: { stripeSubscriptionId },
-    create: {
-      userId,
-      plan,
-      status: "ACTIVE",
-      charityId,
-      charityPercentage: Number(charityPercentage),
-      currentPeriodStart: periodStart,
-      currentPeriodEnd: periodEnd,
-      stripeCustomerId,
-      stripeSubscriptionId,
-    },
-    update: {},
-  });
+  try {
+    return await prisma.subscription.upsert({
+      where: { stripeSubscriptionId },
+      create: {
+        userId,
+        plan,
+        status: "ACTIVE",
+        charityId,
+        charityPercentage: Number(charityPercentage),
+        currentPeriodStart: periodStart,
+        currentPeriodEnd: periodEnd,
+        stripeCustomerId,
+        stripeSubscriptionId,
+      },
+      update: {},
+    });
+  } catch (err) {
+    if (err.code === "P2002") {
+      return prisma.subscription.findFirstOrThrow({ where: { stripeSubscriptionId } });
+    }
+    throw err;
+  }
 }
 
 // Looks up a subscription by Stripe subscription ID. If it doesn't exist yet — which can happen

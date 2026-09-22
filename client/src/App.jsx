@@ -6,6 +6,8 @@ import { Dashboard } from "./pages/Dashboard.jsx";
 import { CharityDirectory } from "./pages/CharityDirectory.jsx";
 import { CharityProfile } from "./pages/CharityProfile.jsx";
 import { RequireAuth } from "./components/layout/RequireAuth.jsx";
+import { RequireAdmin } from "./components/layout/RequireAdmin.jsx";
+import { AdminCharities } from "./pages/admin/AdminCharities.jsx";
 
 export function App() {
   return (
@@ -21,6 +23,14 @@ export function App() {
           <RequireAuth>
             <Dashboard />
           </RequireAuth>
+        }
+      />
+      <Route
+        path="/admin/charities"
+        element={
+          <RequireAdmin>
+            <AdminCharities />
+          </RequireAdmin>
         }
       />
     </Routes>

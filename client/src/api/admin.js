@@ -1,0 +1,25 @@
+import { apiRequest } from "./client.js";
+
+export function createCharity(data) {
+  return apiRequest("/admin/charities", { method: "POST", body: data });
+}
+
+export function updateCharity(id, data) {
+  return apiRequest(`/admin/charities/${id}`, { method: "PUT", body: data });
+}
+
+export function deleteCharity(id) {
+  return apiRequest(`/admin/charities/${id}`, { method: "DELETE" });
+}
+
+export function createEvent(charityId, data) {
+  return apiRequest(`/admin/charities/${charityId}/events`, { method: "POST", body: data });
+}
+
+export function updateEvent(id, data) {
+  return apiRequest(`/admin/events/${id}`, { method: "PUT", body: data });
+}
+
+export function deleteEvent(id) {
+  return apiRequest(`/admin/events/${id}`, { method: "DELETE" });
+}

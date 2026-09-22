@@ -5,6 +5,8 @@ import authRoutes from "./routes/auth.routes.js";
 import scoresRoutes from "./routes/scores.routes.js";
 import subscriptionsRoutes from "./routes/subscriptions.routes.js";
 import charitiesRoutes from "./routes/charities.routes.js";
+import donationsRoutes from "./routes/donations.routes.js";
+import adminRoutes from "./routes/admin.routes.js";
 import webhooksRoutes from "./routes/webhooks.routes.js";
 
 const app = express();
@@ -25,6 +27,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/scores", scoresRoutes);
 app.use("/api/subscriptions", subscriptionsRoutes);
 app.use("/api/charities", charitiesRoutes);
+app.use("/api/donations", donationsRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.listen(env.port, () => {
   console.log(`Server listening on port ${env.port}`);
