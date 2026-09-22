@@ -3,10 +3,17 @@ import cors from "cors";
 import { env } from "./config/env.js";
 import authRoutes from "./routes/auth.routes.js";
 import scoresRoutes from "./routes/scores.routes.js";
+import subscriptionsRoutes from "./routes/subscriptions.routes.js";
+import webhooksRoutes from "./routes/webhooks.routes.js";
 
 const app = express();
 
 app.use(cors());
+
+// Mounted before express.json() — Stripe webhook signature verification
+// needs the raw, unparsed request body, not a JSON-parsed object.
+app.use("/api/webhooks", webhooksRoutes);
+
 app.use(express.json());
 
 app.get("/api/health", (req, res) => {
@@ -15,6 +22,7 @@ app.get("/api/health", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/scores", scoresRoutes);
+app.use("/api/subscriptions", subscriptionsRoutes);
 
 app.listen(env.port, () => {
   console.log(`Server listening on port ${env.port}`);

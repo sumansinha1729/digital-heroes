@@ -106,6 +106,7 @@ model Subscription {
 
   payments Payment[]
 
+  @@unique([stripeSubscriptionId])
   @@index([userId])
   @@index([status])
 }
