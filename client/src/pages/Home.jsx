@@ -1,11 +1,23 @@
-import { PageShell } from "../components/layout/PageShell.jsx";
+import { TopNav } from "../components/layout/TopNav.jsx";
+import { Footer } from "../components/layout/Footer.jsx";
+import { Hero } from "./home/Hero.jsx";
+import { HowItWorks } from "./home/HowItWorks.jsx";
+import { CharitySpotlight } from "./home/CharitySpotlight.jsx";
+import { PrizeTeaser } from "./home/PrizeTeaser.jsx";
+import { FinalCta } from "./home/FinalCta.jsx";
 
 export function Home() {
   return (
-    <PageShell>
-      <div className="p-8">
-        <h1 className="font-serif text-4xl">Home — coming in Step 6</h1>
+    <div className="relative min-h-screen bg-surface">
+      <div className="absolute top-0 z-10 w-full">
+        <TopNav variant="dark" />
       </div>
-    </PageShell>
+      <Hero />
+      <HowItWorks />
+      <CharitySpotlight />
+      <PrizeTeaser />
+      <FinalCta />
+      <Footer />
+    </div>
   );
 }
